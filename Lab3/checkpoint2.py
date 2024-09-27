@@ -33,11 +33,11 @@ def adjust_brightness():
         # formatted_time = "{:02}:{:02}:{:02}".format(current_time[4], current_time[5], current_time[6])
     oled.contrast(brightness)  # Adjust the OLED contrast
         # oled.fill(0)
-    # oled.text('Brightness', 64, 0)
+    oled.text('Brightness', 80, 0)
     oled.text(str(sensor_value), 90, 20)
         # oled.text("Time:", 0, 0)
         # oled.text(formatted_time, 64, 0)
-    oled.show()
+    # oled.show()
         # utime.sleep(0.5)  # Small delay to prevent overloading
 
 # Function to display the time on OLED
@@ -53,6 +53,8 @@ def adjust_brightness():
 
 # Start brightness adjustment and time display
 while True:
+    oled.fill(0)
     display_time()
     adjust_brightness()
+    oled.show()
     utime.sleep(1)

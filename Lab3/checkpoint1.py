@@ -66,7 +66,7 @@ def debounce_callback(timer, pin):
 # Function to display time on OLED
 def display_time():
     # while True:
-    oled.fill(0)  # Clear the screen
+    # oled.fill(0)  # Clear the screen
     current_time = rtc.datetime()  # Fetch current time
     builtins.print(current_time)
     formatted_date = "{:04}-{:02}-{:02}".format(current_time[0], current_time[1], current_time[2])  # YYYY-MM-DD
@@ -74,7 +74,7 @@ def display_time():
     oled.text(formatted_date, 0, 0)
     oled.text(formatted_time, 0, 20)
     oled.text("Mode: " + modes[mode_idx], 0, 40)
-    oled.show()
+    # oled.show()
     #utime.sleep(1)
 
 # Cycle through modes
@@ -172,7 +172,9 @@ button_mode.irq(trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING, handler=button_isr)
 
 # Main loop
 while True:
+    oled.fill(0)
     display_time()
+    oled.show()
     utime.sleep(1)
 
 # Function to increment time
