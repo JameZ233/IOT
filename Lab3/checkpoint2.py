@@ -21,7 +21,7 @@ light_sensor = ADC(0)  # Pin A0
 def map_brightness(value):
     # Assume light_sensor value ranges from 0 (dark) to 1023 (bright)
     # Scale it to a value suitable for screen brightness (0 - 255)
-    return int(value / 1024 * 255)
+    return int(value / 1023 * 255)
 
 # Function to adjust brightness based on ambient light
 def adjust_brightness():
