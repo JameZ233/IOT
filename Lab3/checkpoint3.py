@@ -29,6 +29,9 @@ buzzer = Pin(15, Pin.OUT)  # Assuming Pin 15 is used for the alarm buzzer/motor
 pwm_buzzer=PWM(buzzer)
 pwm_buzzer.freq(FREQUENCY)
 
+# add alarm mode to modes
+modes.append("alarm")
+
 # Debounce function for buttons (reusable from Lab 2)
 # def debounce(pin):
 #     utime.sleep_ms(200)  # delay for debouncing
@@ -74,33 +77,109 @@ pwm_buzzer.freq(FREQUENCY)
 
 # Variables to store alarm time
 alarm_set = False
-alarm_hour = 15
-alarm_minute = 30
+alarm_hour = None  # 15
+alarm_minute = None  # 30
 
-# Function to set the alarm
-def set_alarm():
-    global alarm_set, alarm_hour, alarm_minute
-    while True:
-        if debounce(button1) == 0:
-            alarm_hour = (alarm_hour + 1) % 24
-        elif debounce(button2) == 0:
-            alarm_minute = (alarm_minute + 1) % 60
-        elif debounce(button3) == 0:
+# Interrupt Service Routine for the button
+# def button_isr(pin):
+#     global mode_idx
+#     # Disable the interrupt temporarily
+#     pin.irq(handler=None)
+    
+#     # Start debounce timer
+#     if mode_idx == 5:
+#         debounce_timer.init(mode=Timer.ONE_SHOT, period=DEBOUNCE_TIME, callback=lambda t:alarm_callback(t, pin))
+#     else:
+#         debounce_timer.init(mode=Timer.ONE_SHOT, period=DEBOUNCE_TIME, callback=lambda t:debounce_callback(t, pin))
+
+# Interrupt Service Routine for the alarm
+# def alarm_isr(pin):
+#     # Disable the interrupt temporarily
+#     pin.irq(handler=None)
+    
+#     # Start debounce timer
+#     debounce_timer.init(mode=Timer.ONE_SHOT, period=DEBOUNCE_TIME, callback=lambda t:alarm_callback(t, pin))
+
+# def alarm_callback(timer, pin):
+#     global alarm_set
+#     if not pin.value():  # Button pressed (value is 0)
+#         if pin == button_inc:
+#             modify_alarm('hour')
+#             builtins.print('Increment alarm hour')
+#         elif pin == button_dec:
+#             modify_alarm('minute')
+#             builtins.print('Increment alarm minute')
+#         elif pin == button_mode:
+#             alarm_set = True
+#             switch_mode()
+#             builtins.print('Set alarm & switch mode')
+#         # button_pressed = True
+#     # else:
+#         # button_pressed = False
+#     # Re-enable interrupt after debounce
+#     # if mode_idx == 5:
+#     #     pin.irq(trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING, handler=alarm_isr)
+#     # else:
+#         # Attach interrupt to the alarm button (falling and rising edge)
+#     pin.irq(trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING, handler=button_isr)
+
+# Function to display alarm on OLED
+def display_alarm():
+    oled.text("Set Alarm:", 0, 0)
+    formatted_hr = "--" if alarm_hour is None else "{:02}".format(alarm_hour)
+    formatted_min = "--" if alarm_minute is None else "{:02}".format(alarm_minute)
+    oled.text(formatted_hr + ":" + formatted_min, 0, 20)
+
+# Set alarm at alarm mode & cycle through modes (override)
+def switch_mode():
+    global mode_idx, alarm_set
+    if mode_idx == 5:
+        if alarm_hour is not None and alarm_minute is not None:
             alarm_set = True
-            break  # Exit after setting alarm
+            builtins.print('set alarm')
+        else:
+            alarm_set = False
+            builtins.print('disable alarm')
+    mode_idx = (mode_idx + 1) % len(modes)
 
-        oled.fill(0)
-        oled.text("Set Alarm:", 0, 0)
-        formatted_alarm = "{:02}:{:02}".format(alarm_hour, alarm_minute)
-        oled.text(formatted_alarm, 0, 20)
-        oled.show()
-        utime.sleep(0.2)
+# Increment or decrement the selected time unit (override)
+def modify_time(change):
+    match mode_idx:
+        case 0:  # year
+            set_year(change)
+        case 1:  # month
+            set_month(change)
+        case 2:  # day
+            set_day(change)
+        case 3:  # hour
+            set_hour(change)
+        case 4:  # minute
+            set_minute(change)
+        case 5:  # alarm
+            set_alarm(change)
+
+# Increment hour or minute of alarm
+def set_alarm(change):
+    global alarm_hour, alarm_minute
+    if change > 0:
+        if alarm_hour is None:
+            alarm_hour = 0
+        else:
+            alarm_hour = (alarm_hour + 1) % 25
+            if alarm_hour == 24:
+                alarm_hour = None
+    elif change < 0:
+        if alarm_minute is None:
+            alarm_minute = 0
+        else:
+            alarm_minute = (alarm_minute + 1) % 61
+            if alarm_minute == 60:
+                alarm_minute = None
 
 # Function to check if alarm time has been reached
 def check_alarm():
-    global alarm_set
     current_time = rtc.datetime()
-    builtins.print('cuurent time',current_time)
+    builtins.print('cuurent time:', current_time)
     if alarm_set and current_time[4] == alarm_hour and current_time[5] == alarm_minute:
         trigger_alarm()
 
@@ -112,14 +191,14 @@ def trigger_alarm():
     pwm_buzzer.on()
     utime.sleep(5)
     pwm_buzzer.off()
-    # utime.sleep(0.5)
-
-# Run alarm setup first
-set_alarm()
 
 # Start the system (integrate alarm check and time display)
 while True:
-    
+    oled.fill(0)
+    if mode_idx == 5:
+        display_alarm()
+    else:
+        display_time()
+    oled.show()
     check_alarm()
-    display_time()
     utime.sleep(1)
