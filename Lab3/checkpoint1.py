@@ -11,9 +11,9 @@ oled = SSD1306_I2C(oled_width, oled_height, i2c)
 # Initialize the RTC (real-time clock)
 rtc = RTC()
 now = utime.localtime()
-builtins.print('now1',now)
+builtins.print('utime.localtime():', now)
 rtc.datetime((now[0],now[1],now[2],now[6],now[3],now[4],now[5],0))  # Example hardcoded datetime (YYYY, M, D, Weekday, H, M, S, Subsecond)
-builtins.print('nowtime',rtc.datetime())
+builtins.print('rtc.datetime():', rtc.datetime())
 
 # Button pins
 button_inc = Pin(12, Pin.IN, Pin.PULL_UP)  # To increase time
@@ -44,13 +44,13 @@ def debounce_callback(timer, pin):
     if not pin.value():  # Button pressed (value is 0)
         if pin == button_inc:
             modify_time(1)
-            builtins.print('Increment')
+            builtins.print('inc btn pressed')
         elif pin == button_dec:
             modify_time(-1)
-            builtins.print('Decrement')
+            builtins.print('dec btn pressed')
         elif pin == button_mode:
             switch_mode()
-            builtins.print('Switch mode')
+            builtins.print('switch mode')
         # button_pressed = True
     # else:
         # button_pressed = False
@@ -87,25 +87,30 @@ def is_leap_year(yr):
     return (yr % 4 == 0) and (yr % 100 != 0 or yr % 400 == 0)
 
 # Set year within 0~9999 range
-def set_year(cur_time, change):
+def set_year(change):
+    cur_time = list(rtc.datetime())
     new_year = cur_time[0] + change
     if new_year < 0:
         new_year = 9999
     elif new_year > 9999:
         new_year = 0
     cur_time[0] = new_year
+    rtc.datetime(tuple(cur_time))
 
 # Set month within 1~12 range
-def set_month(cur_time, change):
+def set_month(change):
+    cur_time = list(rtc.datetime())
     new_month = cur_time[1] + change
     if new_month < 1:
         new_month = 12
     elif new_month > 12:
         new_month = 1
     cur_time[1] = new_month
+    rtc.datetime(tuple(cur_time))
 
 # Set day within 1~28/29/30/31 range w.r.t. month
-def set_day(cur_time, change):
+def set_day(change):
+    cur_time = list(rtc.datetime())
     new_day = cur_time[2] + change
     match cur_time[1]:
         case 1, 3, 5, 7, 8, 10, 12:
@@ -130,40 +135,45 @@ def set_day(cur_time, change):
                 elif new_day < 1:
                     new_day = 28
     cur_time[2] = new_day
+    rtc.datetime(tuple(cur_time))
 
 # Set hour within 0~23 range
-def set_hour(cur_time, change):
+def set_hour(change):
+    cur_time = list(rtc.datetime())
     new_hour = cur_time[4] + change
     if new_hour < 0:
         new_hour = 23
     elif new_hour > 23:
         new_hour = 0
     cur_time[4] = new_hour
+    rtc.datetime(tuple(cur_time))
 
 # Set minite within 0~59 range
-def set_minute(cur_time, change):
+def set_minute(change):
+    cur_time = list(rtc.datetime())
     new_minute = cur_time[5] + change
     if new_minute < 0:
         new_minute = 59
     elif new_minute > 59:
         new_minute = 0
     cur_time[5] = new_minute
+    rtc.datetime(tuple(cur_time))
 
 # Increment or decrement the selected time unit
 def modify_time(change):
-    cur_time = list(rtc.datetime())
+    # cur_time = list(rtc.datetime())
     match mode_idx:
         case 0:  # year
-            set_year(cur_time, change)
+            set_year(change)
         case 1:  # month
-            set_month(cur_time, change)
+            set_month(change)
         case 2:  # day
-            set_day(cur_time, change)
+            set_day(change)
         case 3:  # hour
-            set_hour(cur_time, change)
+            set_hour(change)
         case 4:  # minute
-            set_minute(cur_time, change)
-    rtc.datetime(tuple(cur_time))
+            set_minute(change)
+    # rtc.datetime(tuple(cur_time))
 
 # Attach interrupt to the buttons (falling and rising edge)
 button_inc.irq(trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING, handler=button_isr)
