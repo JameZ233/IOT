@@ -51,22 +51,10 @@ def debounce_callback(timer, pin):
         elif pin == button_mode:
             switch_mode()
             builtins.print('switch mode')
-        # button_pressed = True
-    # else:
-        # button_pressed = False
-    # Re-enable interrupt after debounce
     pin.irq(trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING, handler=button_isr)
-
-# Debounce function for buttons
-# def debounce(pin):
-#     if not pin.value():
-#         utime.sleep_ms(200)  # delay for debouncing
-#     return pin.value()
 
 # Function to display time on OLED
 def display_time():
-    # while True:
-    # oled.fill(0)  # Clear the screen
     current_time = rtc.datetime()  # Fetch current time
     builtins.print(current_time)
     formatted_date = "{:04}-{:02}-{:02}".format(current_time[0], current_time[1], current_time[2])  # YYYY-MM-DD
@@ -74,8 +62,6 @@ def display_time():
     oled.text(formatted_date, 0, 0)
     oled.text(formatted_time, 0, 20)
     oled.text("Mode: " + modes[mode_idx], 0, 40)
-    # oled.show()
-    #utime.sleep(1)
 
 # Cycle through modes
 def switch_mode():
@@ -191,22 +177,3 @@ while True:
     display_time()
     oled.show()
     utime.sleep(1)
-
-# Function to increment time
-# def inc_time():
-#     current_time = list(rtc.datetime())
-#     current_time[4] = (current_time[4] + 1) % 24  # Increment hour and wrap around after 23
-#     rtc.datetime(tuple(current_time))
-
-# Function to decrement time
-# def dec_time():
-#     current_time = list(rtc.datetime())
-#     current_time[4] = (current_time[4] - 1) % 24  # Decrement hour and wrap around after 0
-#     rtc.datetime(tuple(current_time))
-
-# Function to select mode
-# def select_mode():
-    # rtc.datetime((2024, 9, 25, 2, 15, 30, 0, 0))  # Reset to the original time
-
-# Start displaying time
-# display_time()
