@@ -92,14 +92,15 @@ def trigger_alarm():
     utime.sleep(5)
     pwm_buzzer.duty(0)
 
+if __name__ == "__main__":
 # Start the system (integrate alarm check and time display)
-while True:
-    oled.fill(0)
-    if mode_idx == 5:
-        display_alarm()
-    else:
-        display_time()
-    oled.show()
-    builtins.print(mode_idx)
-    check_alarm()
-    utime.sleep(1)
+    while True:
+        oled.fill(0)
+        if mode_idx == 5:
+            display_alarm()
+        else:
+            display_time()
+        oled.show()
+        builtins.print(mode_idx)
+        check_alarm()
+        utime.sleep(1)

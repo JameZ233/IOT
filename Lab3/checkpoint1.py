@@ -171,9 +171,10 @@ button_inc.irq(trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING, handler=button_isr)
 button_dec.irq(trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING, handler=button_isr)
 button_mode.irq(trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING, handler=button_isr)
 
+if __name__ == "__main__":
 # Main loop
-while True:
-    oled.fill(0)
-    display_time()
-    oled.show()
-    utime.sleep(1)
+    while True:
+        oled.fill(0)
+        display_time()
+        oled.show()
+        utime.sleep(1)

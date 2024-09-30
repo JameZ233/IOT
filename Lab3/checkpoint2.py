@@ -19,10 +19,11 @@ def adjust_brightness():
     oled.text('Brightness', 80, 0)
     oled.text(str(sensor_value), 90, 20)
 
+if __name__ == "__main__":
 # Start brightness adjustment and time display
-while True:
-    oled.fill(0)
-    display_time()
-    adjust_brightness()
-    oled.show()
-    utime.sleep(1)
+    while True:
+        oled.fill(0)
+        display_time()
+        adjust_brightness()
+        oled.show()
+        utime.sleep(1)
