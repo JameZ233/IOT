@@ -60,8 +60,8 @@ def display_time():
     formatted_date = "{:04}-{:02}-{:02}".format(current_time[0], current_time[1], current_time[2])  # YYYY-MM-DD
     formatted_time = "{:02}:{:02}:{:02}".format(current_time[4], current_time[5], current_time[6])  # HH:MM:SS
     oled.text(formatted_date, 0, 0)
-    oled.text(formatted_time, 0, 20)
-    oled.text("Mode: " + modes[mode_idx], 0, 40)
+    oled.text(formatted_time, 0, 12)
+    oled.text("Mode: " + modes[mode_idx], 0, 24)
 
 # Cycle through modes
 def switch_mode():
@@ -171,7 +171,7 @@ button_inc.irq(trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING, handler=button_isr)
 button_dec.irq(trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING, handler=button_isr)
 button_mode.irq(trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING, handler=button_isr)
 
-if __name__ == "__main__":
+def main():
 # Main loop
     while True:
         oled.fill(0)

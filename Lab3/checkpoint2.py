@@ -16,10 +16,10 @@ def adjust_brightness():
     builtins.print('lightvalue: ', sensor_value)
     brightness = map_brightness(sensor_value)  # Map to brightness
     oled.contrast(brightness)  # Adjust the OLED contrast
-    oled.text('Brightness', 80, 0)
+    # oled.text('Brightness', 80, 0)
     oled.text(str(sensor_value), 90, 20)
 
-if __name__ == "__main__":
+def main():
 # Start brightness adjustment and time display
     while True:
         oled.fill(0)
