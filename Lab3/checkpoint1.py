@@ -171,7 +171,7 @@ button_inc.irq(trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING, handler=button_isr)
 button_dec.irq(trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING, handler=button_isr)
 button_mode.irq(trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING, handler=button_isr)
 
-if __name__ == "__main__":
+def main():
 # Main loop
     while True:
         oled.fill(0)
