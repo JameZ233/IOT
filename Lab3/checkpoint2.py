@@ -26,4 +26,4 @@ def main():
         display_time()
         adjust_brightness()
         oled.show()
-        utime.sleep(1)
+        utime.sleep(0.1)

@@ -26,7 +26,7 @@ def display_alarm():
 
 # Set alarm at alarm mode & cycle through modes (override)
 def switch_mode():
-    global mode_idx, alarm_set
+    global alarm_set, mode_idx
     if mode_idx == 5:
         if alarm_hour is not None and alarm_minute is not None:
             alarm_set = True
@@ -34,6 +34,7 @@ def switch_mode():
         else:
             alarm_set = False
             builtins.print('disable alarm')
+    checkpoint1.mode_idx = (checkpoint1.mode_idx + 1) % len(modes)
     mode_idx = (mode_idx + 1) % len(modes)
 
 # override switch_mode
@@ -80,7 +81,7 @@ def set_alarm(change):
 def check_alarm():
     current_time = rtc.datetime()
     builtins.print('cuurent time:', current_time)
-    if alarm_set and current_time[4] == alarm_hour and current_time[5] == alarm_minute:
+    if alarm_set and current_time[4] == alarm_hour and current_time[5] == alarm_minute and current_time[6] == 0:
         trigger_alarm()
 
 # Function to trigger the alarm
@@ -91,8 +92,7 @@ def trigger_alarm():
     pwm_buzzer.duty(512)
     utime.sleep(5)
     pwm_buzzer.duty(0)
-
-if __name__ == "__main__":
+def main():
 # Start the system (integrate alarm check and time display)
     while True:
         oled.fill(0)
@@ -101,6 +101,6 @@ if __name__ == "__main__":
         else:
             display_time()
         oled.show()
-        builtins.print(mode_idx)
+        builtins.print('check3idx',mode_idx)
         check_alarm()
         utime.sleep(1)

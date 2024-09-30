@@ -10,6 +10,7 @@ oled = SSD1306_I2C(oled_width, oled_height, i2c)
 
 # Initialize the RTC (real-time clock)
 rtc = RTC()
+rtc.datetime((2024, 9, 30, 0, 15, 30, 0, 0))
 now = utime.localtime()
 builtins.print('utime.localtime():', now)
 rtc.datetime((now[0],now[1],now[2],now[6],now[3],now[4],now[5],0))  # Example hardcoded datetime (YYYY, M, D, Weekday, H, M, S, Subsecond)
@@ -56,7 +57,7 @@ def debounce_callback(timer, pin):
 # Function to display time on OLED
 def display_time():
     current_time = rtc.datetime()  # Fetch current time
-    builtins.print(current_time)
+    builtins.print('check1idx',mode_idx)
     formatted_date = "{:04}-{:02}-{:02}".format(current_time[0], current_time[1], current_time[2])  # YYYY-MM-DD
     formatted_time = "{:02}:{:02}:{:02}".format(current_time[4], current_time[5], current_time[6])  # HH:MM:SS
     oled.text(formatted_date, 0, 0)
