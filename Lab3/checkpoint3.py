@@ -9,36 +9,13 @@ buzzer = Pin(15, Pin.OUT)  # Assuming Pin 15 is used for the alarm buzzer/motor
 pwm_buzzer=PWM(buzzer)
 pwm_buzzer.freq(FREQUENCY)
 
-# Timer for debounce
-debounce_timer = Timer(-1)
-
-# Debounce time in milliseconds
-DEBOUNCE_TIME = 200
-
-# Time modification modes
-modes = ["year", "month", "day", "hour", "minute","alarm"]
-mode_idx = 0  # Start with "year"
 # add alarm mode to modes
 modes.append("alarm")
 
 # Variables to store alarm time
 alarm_set = False
-alarm_hour = None  # 15
-alarm_minute = None  # 30
-
-# Function to display time on OLED
-def display_time():
-    # while True:
-    # oled.fill(0)  # Clear the screen
-    current_time = rtc.datetime()  # Fetch current time
-    builtins.print(current_time)
-    formatted_date = "{:04}-{:02}-{:02}".format(current_time[0], current_time[1], current_time[2])  # YYYY-MM-DD
-    formatted_time = "{:02}:{:02}:{:02}".format(current_time[4], current_time[5], current_time[6])  # HH:MM:SS
-    oled.text(formatted_date, 0, 0)
-    oled.text(formatted_time, 0, 20)
-    oled.text("Mode: " + modes[mode_idx], 0, 40)
-    # oled.show()
-    #utime.sleep(1)
+alarm_hour = 14  # None
+alarm_minute = 29  # None
 
 # Function to display alarm on OLED
 def display_alarm():
@@ -115,19 +92,14 @@ def trigger_alarm():
     utime.sleep(5)
     pwm_buzzer.duty(0)
 
-# Attach interrupt to the buttons (falling and rising edge)
-button_inc.irq(trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING, handler=button_isr)
-button_dec.irq(trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING, handler=button_isr)
-button_mode.irq(trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING, handler=button_isr)
-
 # Start the system (integrate alarm check and time display)
-# while True:
-#     oled.fill(0)
-#     if mode_idx == 5:
-#         display_alarm()
-#     else:
-#         display_time()
-#     oled.show()
-#     builtins.print(mode_idx)
-#     check_alarm()
-#     utime.sleep(1)
+while True:
+    oled.fill(0)
+    if mode_idx == 5:
+        display_alarm()
+    else:
+        display_time()
+    oled.show()
+    builtins.print(mode_idx)
+    check_alarm()
+    utime.sleep(1)
