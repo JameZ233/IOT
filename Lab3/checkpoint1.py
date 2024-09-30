@@ -112,30 +112,37 @@ def set_month(change):
 def set_day(change):
     cur_time = list(rtc.datetime())
     new_day = cur_time[2] + change
-    match cur_time[1]:
-        case 1, 3, 5, 7, 8, 10, 12:
-            if new_day > 31:
+    
+    # January, March, May, July, August, October, December (months with 31 days)
+    if cur_time[1] in [1, 3, 5, 7, 8, 10, 12]:
+        if new_day > 31:
+            new_day = 1
+        elif new_day < 1:
+            new_day = 31
+    
+    # April, June, September, November (months with 30 days)
+    elif cur_time[1] in [4, 6, 9, 11]:
+        if new_day > 30:
+            new_day = 1
+        elif new_day < 1:
+            new_day = 30
+    
+    # February
+    elif cur_time[1] == 2:
+        if is_leap_year(cur_time[0]):
+            if new_day > 29:
                 new_day = 1
             elif new_day < 1:
-                new_day = 31
-        case 4, 6, 9, 11:
-            if new_day > 30:
+                new_day = 29
+        else:
+            if new_day > 28:
                 new_day = 1
             elif new_day < 1:
-                new_day = 30
-        case 2:
-            if is_leap_year(cur_time[0]):
-                if new_day > 29:
-                    new_day = 1
-                elif new_day < 1:
-                    new_day = 29
-            else:
-                if new_day > 28:
-                    new_day = 1
-                elif new_day < 1:
-                    new_day = 28
+                new_day = 28
+    
     cur_time[2] = new_day
     rtc.datetime(tuple(cur_time))
+
 
 # Set hour within 0~23 range
 def set_hour(change):
@@ -161,18 +168,16 @@ def set_minute(change):
 
 # Increment or decrement the selected time unit
 def modify_time(change):
-    # cur_time = list(rtc.datetime())
-    match mode_idx:
-        case 0:  # year
-            set_year(change)
-        case 1:  # month
-            set_month(change)
-        case 2:  # day
-            set_day(change)
-        case 3:  # hour
-            set_hour(change)
-        case 4:  # minute
-            set_minute(change)
+    if mode_idx == 0:  # year
+        set_year(change)
+    elif mode_idx == 1:  # month
+        set_month(change)
+    elif mode_idx == 2:  # day
+        set_day(change)
+    elif mode_idx == 3:  # hour
+        set_hour(change)
+    elif mode_idx == 4:  # minute
+        set_minute(change)
     # rtc.datetime(tuple(cur_time))
 
 # Attach interrupt to the buttons (falling and rising edge)
