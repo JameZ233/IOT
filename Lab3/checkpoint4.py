@@ -1,7 +1,7 @@
 from checkpoint2 import *
 from checkpoint3 import *
 
-if __name__ == "__main__":
+def main():
     # Start the system (integrate alarm check and time display)
     while True:
         oled.fill(0)

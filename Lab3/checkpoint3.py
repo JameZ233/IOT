@@ -91,7 +91,8 @@ def trigger_alarm():
     pwm_buzzer.duty(512)
     utime.sleep(5)
     pwm_buzzer.duty(0)
-def main():
+
+if __name__ == "__main__":
 # Start the system (integrate alarm check and time display)
     while True:
         oled.fill(0)
