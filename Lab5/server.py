@@ -8,6 +8,10 @@ import time
 import network
 import urequests
 import ujson
+import ntptime
+
+NTP_SERVER = "pool.ntp.org"
+NTP_PORT = 123
 
 # Initialize I2C for OLED
 FREQUENCY = 256
@@ -19,13 +23,21 @@ buzzer = Pin(15, Pin.OUT)  # Assuming Pin 15 is used for the alarm buzzer/motor
 pwm_buzzer=PWM(buzzer)
 pwm_buzzer.freq(FREQUENCY)
 
+
+# Connect to Wi-Fi
+def connect_wifi():
+    wlan = network.WLAN(network.STA_IF)
+    wlan.active(True)
+    wlan.connect('Columbia University', '')  # Replace with your Wi-Fi credentials
+    while not wlan.isconnected():
+        pass
+    print('Connected to Wi-Fi')
+
 # Initialize the RTC (real-time clock)
+connect_wifi()
 rtc = RTC()
-rtc.datetime((2024, 9, 30, 0, 15, 30, 0, 0))
-now = utime.localtime()
-builtins.print('utime.localtime():', now)
-rtc.datetime((now[0],now[1],now[2],now[6],now[3],now[4],now[5],0))  # Example hardcoded datetime (YYYY, M, D, Weekday, H, M, S, Subsecond)
-builtins.print('rtc.datetime():', rtc.datetime())
+ntptime.settime() # set the rtc datetime from the remote server
+rtc.datetime()    # get the date and time in UTC
 
 # Time modification modes
 modes = ["year", "month", "day", "hour", "minute"]
@@ -47,15 +59,14 @@ def display_time():
     current_time = rtc.datetime()  # Fetch current time
     builtins.print('check1idx',mode_idx)
     formatted_date = "{:04}-{:02}-{:02}".format(current_time[0], current_time[1], current_time[2])  # YYYY-MM-DD
-    formatted_time = "{:02}:{:02}:{:02}".format(current_time[4], current_time[5], current_time[6])  # HH:MM:SS
+    formatted_time = "{:02}:{:02}:{:02}".format(current_time[4]-4, current_time[5], current_time[6])  # HH:MM:SS
     oled.text(formatted_date, 0, 0)
     oled.text(formatted_time, 0, 12)
     oled.show()
 
 def set_alarm(alarm_hour, alarm_minute):
     current_time = rtc.datetime()
-    builtins.print('cuurent time:', current_time)
-    if current_time[4] == alarm_hour and current_time[5] == alarm_minute:
+    if current_time[4] == alarm_hour +4 and current_time[5] == alarm_minute:
         trigger_alarm()
     
 # Function to trigger the alarm
@@ -66,15 +77,6 @@ def trigger_alarm():
     pwm_buzzer.duty(512)
     utime.sleep(5)
     pwm_buzzer.duty(0)
-
-# Connect to Wi-Fi
-def connect_wifi():
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active(True)
-    wlan.connect('Columbia University', '')  # Replace with your Wi-Fi credentials
-    while not wlan.isconnected():
-        pass
-    print('Connected to Wi-Fi')
 
 def get_geolocation():
     url = "http://ip-api.com/json"
@@ -102,6 +104,11 @@ def display_weather():
     oled.text('Desc: {}'.format(description), 0, 16)
     oled.show()
 
+def bad_request_handler(response):
+    oled.fill(0)
+    oled.text(response,0,0)
+    oled.show()
+
 # Map commands to smartwatch functions
 command_map = {
     "screen_on": screen_on,
@@ -109,7 +116,8 @@ command_map = {
     "display_time": display_time,
     "set_alarm": set_alarm,
     'display_location': display_location,
-    'display_weather': display_weather
+    'display_weather': display_weather,
+    'display_text': bad_request_handler
 }
 
 # Server code for ESP8266 to receive and process commands
@@ -118,7 +126,7 @@ def run_server():
     s = socket.socket()
     s.bind(addr)
     s.listen(1)
-    print('Run through')
+    print('Waiting for Transmission')
     while True:
         cl, addr = s.accept()
         print("Client connected from", addr)
