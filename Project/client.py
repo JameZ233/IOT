@@ -47,6 +47,7 @@ def capture_data(channel):
     """Record video & audio & detect speech using VAD."""
     global pcm, picam2
     print("Listening for voice commands...")
+    audio_buffer=BytesIO()
     # Start Recording Video
     picam2.start()
     picam2.start_recording(H264Encoder(),output='video.mp4')
