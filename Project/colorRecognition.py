@@ -1,9 +1,9 @@
-import os
-# Suppress TensorFlow logs
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+# iress TensorFlow logs
+# os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-import absl.logging
-absl.logging.set_verbosity(absl.logging.ERROR)
+# import absl.logging
+# absl.logging.set_verbosity(absl.logging.ERROR)mport os
+# Supp
 
 import cv2
 import mediapipe as mp
@@ -243,6 +243,6 @@ def process_video(file_path, object_type):
     return result
 
 # Example usage:
-file_path = "input_video.mp4"  # Path to your MP4 file
-result = process_video(file_path, "bottle")  # Detect the color of a bottle
-print(f"Result: {result}")
+# file_path = "input_video.mp4"  # Path to your MP4 file
+# result = process_video(file_path, "bottle")  # Detect the color of a bottle
+# print(f"Result: {result}")
